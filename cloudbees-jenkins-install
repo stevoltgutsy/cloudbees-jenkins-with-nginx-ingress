@@ -1,0 +1,55 @@
+I used Helm 3 for this demonstration in KVM platform 
+
+helm repo add cloudbees https://charts.cloudbees.com/public/cloudbees
+helm repo update
+helm search repo jenkins
+
+helm inspect values stable/jenkins > /tmp/jenkins.values
+
+add storageclass: < name of your storage class to enable persistent voluem creation for Jenkins>
+
+run your helm chart command to install Jenkins on your Kubernetes bare-metal running on KVM or Virtualbox(via vagrant).
+
+helm install cloudbees-jenkins-distribution  cloudbees/cloudbees-jenkins-distribution --set nginx-ingress.enabled=true -f /tmp/jenkins.values --namespace=cloudbees-jenkins-distribution
+
+
+==================================================================================================================================================
+
+root@mgmt-host:~# helm install cloudbees-jenkins-distribution  cloudbees/cloudbees-jenkins-distribution --set nginx-ingress.enabled=true -f /tmp/jenkins.values --namespace=cloudbees-jenkins-distribution
+NAME: cloudbees-jenkins-distribution
+LAST DEPLOYED: Mon May 25 03:46:41 2020
+NAMESPACE: cloudbees-jenkins-distribution
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+1. Get your 'admin' user password by running:
+  printf $(kubectl get secret --namespace cloudbees-jenkins-distribution cloudbees-jenkins-distribution -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo
+2. Get the CloudBees Jenkins Distribution URL to visit by running these commands in the same shell:
+  export NODE_PORT=$(kubectl get --namespace cloudbees-jenkins-distribution -o jsonpath="{.spec.ports[0].nodePort}" services cloudbees-jenkins-distribution)
+  export NODE_IP=$(kubectl get nodes --namespace cloudbees-jenkins-distribution -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT/login
+
+3. Login with the password from step 1 and the username: admin
+root@mgmt-host:~# 
+root@mgmt-host:~# 
+
+
+
+root@mgmt-host:~# 
+root@mgmt-host:~# printf $(kubectl get secret --namespace cloudbees-jenkins-distribution cloudbees-jenkins-distribution -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo
+admin123
+root@mgmt-host:~# export NODE_PORT=$(kubectl get --namespace cloudbees-jenkins-distribution -o jsonpath="{.spec.ports[0].nodePort}" services cloudbees-jenkins-distribution)
+  export NODE_IP=$(kubectl get nodes --namespace cloudbees-jenkins-distribution -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT/loginroot@mgmt-host:~#   export NODE_IP=$(kubectl get nodes --namespace cloudbees-jenkins-distribution -o jsonpath="{.items[0].status.addresses[0].address}")
+root@mgmt-host:~#   echo http://$NODE_IP:$NODE_PORT/login
+http://192.168.84.2:30290/login
+root@mgmt-host:~# 
+root@mgmt-host:~# 
+
+
+Access Cloudbees Jenkins via any of the cluster node IPs mapped to the exposed NodePort.
+
+http://IP ADDr:NodePort/
+
+
